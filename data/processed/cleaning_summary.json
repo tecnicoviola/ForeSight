@@ -1,0 +1,19 @@
+{
+  "initial_raw_records": 1067371,
+  "duplicate_rows_removed": 34335,
+  "invalid_dates_removed": 0,
+  "cancellations_excluded": 22497,
+  "non_positive_quantity_removed": 0,
+  "non_positive_price_removed": 2626,
+  "missing_descriptions_imputed": 0,
+  "guest_transactions_retained": 228488,
+  "final_cleaned_records": 1007913,
+  "retention_rate_pct": 94.43,
+  "min_invoice_date": "2009-12-01 07:45:00",
+  "max_invoice_date": "2011-12-09 12:50:00",
+  "total_revenue": 20476260.43,
+  "total_units_sold": 11205148,
+  "total_invoices": 40077,
+  "total_products": 4916,
+  "total_countries": 43
+}
