@@ -1,6 +1,6 @@
 """
-Formatting, UI card, and Plotly styling helpers for ForeSight.
-Dynamically respects Light / Dark mode settings with animations and high-contrast typography.
+Formatting, Component Builders, and Plotly Styling Utilities for ForeSight.
+Follows Linear / Stripe design principles: crisp contrast, equal heights, tabular numbers, subtle micro-interactions.
 """
 
 from typing import Dict, Any, Optional
@@ -10,7 +10,7 @@ from src.utils.config import THEME_LIGHT, THEME_DARK, CURRENCY_SYMBOL, FONT_FAMI
 
 
 def get_current_theme() -> Dict[str, Any]:
-    """Returns the active theme palette based on session state."""
+    """Retrieves the active design tokens based on session state."""
     mode = st.session_state.get("theme_mode", "Light")
     return THEME_DARK if mode == "Dark" else THEME_LIGHT
 
@@ -56,15 +56,15 @@ def format_percentage(val: float, include_sign: bool = False) -> str:
     return f"{prefix}{val:.2f}%"
 
 
-def apply_theme_to_figure(fig: go.Figure, title: Optional[str] = None, height: int = 380) -> go.Figure:
-    """Applies dynamic Light or Dark mode styling to a Plotly figure."""
+def apply_theme_to_figure(fig: go.Figure, title: Optional[str] = None, height: int = 370) -> go.Figure:
+    """Applies unified Linear/Stripe-inspired SaaS styling to a Plotly figure."""
     theme = get_current_theme()
     is_dark = theme["mode"] == "dark"
 
     fig.update_layout(
         title=dict(
             text=f"<b>{title}</b>" if title else "",
-            font=dict(family=FONT_FAMILY, size=15, color=theme["text_primary"]),
+            font=dict(family=FONT_FAMILY, size=14, color=theme["text_primary"]),
             x=0.01,
             y=0.96,
         ) if title else None,
@@ -96,13 +96,37 @@ def apply_theme_to_figure(fig: go.Figure, title: Optional[str] = None, height: i
             tickfont=dict(family=FONT_FAMILY, size=11, color=theme["text_muted"]),
         ),
         hoverlabel=dict(
-            bgcolor="#0F172A" if not is_dark else "#1F2937",
+            bgcolor="#0F172A" if not is_dark else "#182238",
             font_size=12,
             font_family=FONT_FAMILY,
             font_color="#FFFFFF"
         ),
     )
     return fig
+
+
+def render_page_header(title: str, description: str, badge: Optional[str] = None):
+    """Renders a unified, premium SaaS application header across all pages."""
+    theme = get_current_theme()
+    is_dark = theme["mode"] == "dark"
+
+    badge_html = (
+        f'<span style="background:{"#1E293B" if is_dark else "#EFF6FF"}; color:{"#60A5FA" if is_dark else "#2563EB"}; border:1px solid {"#2563EB" if is_dark else "#BFDBFE"}; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:700; letter-spacing:0.02em;">{badge}</span>'
+        if badge else ""
+    )
+
+    header_html = (
+        f'<div class="fs-page-header" style="margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid {theme["border"]}; display:flex; justify-content:space-between; align-items:flex-end;">'
+        f'<div>'
+        f'<div style="display:flex; align-items:center; gap:10px;">'
+        f'<h1 style="margin:0; font-size:24px; font-weight:800; color:{theme["text_primary"]}; letter-spacing:-0.03em; font-family:\'Plus Jakarta Sans\', sans-serif;">{title}</h1>'
+        f'{badge_html}'
+        f'</div>'
+        f'<div style="font-size:13px; color:{theme["text_muted"]}; margin-top:4px; font-weight:500;">{description}</div>'
+        f'</div>'
+        f'</div>'
+    )
+    st.markdown(header_html, unsafe_allow_html=True)
 
 
 def render_kpi_card_html(
@@ -114,8 +138,8 @@ def render_kpi_card_html(
     accent_bar: str = "#2563EB"
 ) -> str:
     """
-    Renders a modern, animated, unindented HTML KPI card.
-    Prevents text-wrapping on large numbers and adapts to Light/Dark modes.
+    Renders an equal-height, tabular-numeral, premium SaaS KPI card.
+    100% unindented string prevents any Markdown code-block parsing errors.
     """
     theme = get_current_theme()
     is_dark = theme["mode"] == "dark"
@@ -125,7 +149,7 @@ def render_kpi_card_html(
         "danger": ("#FEF2F2", "#DC2626"),
         "warning": ("#FFFBEB", "#D97706"),
         "primary": ("#EFF6FF", "#2563EB"),
-        "neutral": ("#F1F5F9", "#334155"),
+        "neutral": ("#F1F5F9", "#475569"),
     }
     badge_colors_dark = {
         "success": ("#064E3B", "#34D399"),
@@ -139,28 +163,28 @@ def render_kpi_card_html(
     bg, fg = badge_palette.get(badge_type, badge_palette["neutral"])
     
     badge_span = (
-        f'<span style="background:{bg}; color:{fg}; padding:3px 8px; border-radius:9999px; font-size:11px; font-weight:700; letter-spacing:0.02em;">{badge}</span>'
+        f'<span style="background:{bg}; color:{fg}; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; letter-spacing:0.02em;">{badge}</span>'
         if badge else ""
     )
     
     subtitle_div = (
-        f'<div style="font-size:12px; color:{theme["text_muted"]}; margin-top:6px; font-weight:500;">{subtitle}</div>'
+        f'<div style="font-size:12px; color:{theme["text_muted"]}; margin-top:4px; font-weight:500; line-height:1.4;">{subtitle}</div>'
         if subtitle else ""
     )
 
     card_bg = theme["surface"]
     card_border = theme["border"]
     text_primary = theme["text_primary"]
-    text_secondary = theme["text_secondary"]
-    shadow = "0 4px 6px -1px rgba(0, 0, 0, 0.3)" if is_dark else "0 1px 3px rgba(15,23,42,0.06)"
+    text_label = theme["text_muted"]
+    shadow = "0 1px 2px rgba(0,0,0,0.2)" if is_dark else "0 1px 3px rgba(15,23,42,0.04)"
 
     raw_html = (
-        f'<div class="foresight-kpi-card" style="background:{card_bg}; border:1px solid {card_border}; border-top:3px solid {accent_bar}; border-radius:12px; padding:18px 20px; box-shadow:{shadow}; margin-bottom:14px; min-height:118px; display:flex; flex-direction:column; justify-content:space-between; animation:fadeInUp 0.35s ease-out;">'
+        f'<div class="foresight-kpi-card" style="background:{card_bg}; border:1px solid {card_border}; border-top:2.5px solid {accent_bar}; border-radius:10px; padding:16px 18px; box-shadow:{shadow}; min-height:116px; display:flex; flex-direction:column; justify-content:space-between; animation:fadeInUp 0.3s ease-out;">'
         f'<div style="display:flex; justify-content:space-between; align-items:center;">'
-        f'<span style="font-size:11px; font-weight:700; color:{text_secondary}; text-transform:uppercase; letter-spacing:0.06em;">{title}</span>'
+        f'<span style="font-size:11px; font-weight:700; color:{text_label}; text-transform:uppercase; letter-spacing:0.06em;">{title}</span>'
         f'{badge_span}'
         f'</div>'
-        f'<div style="font-size:clamp(20px, 1.8vw, 26px); font-weight:800; color:{text_primary}; margin-top:8px; letter-spacing:-0.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:\'Plus Jakarta Sans\', sans-serif;">'
+        f'<div style="font-size:clamp(19px, 1.7vw, 25px); font-weight:800; color:{text_primary}; margin-top:6px; letter-spacing:-0.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums; font-family:\'Plus Jakarta Sans\', sans-serif;">'
         f'{value}'
         f'</div>'
         f'{subtitle_div}'

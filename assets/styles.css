@@ -1,7 +1,7 @@
-/* ForeSight — High-Contrast Modern SaaS Theme with Micro-Animations */
+/* ForeSight — Enterprise Analytics SaaS Design System */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-/* Preserve Streamlit Material Icons font (Fixes 'keyboard_double' text bug) */
+/* Preserve Google Material Symbols & Icons */
 [data-testid="stIconMaterial"], .material-symbols-rounded, [class*="material-symbols"] {
     font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
     font-weight: normal !important;
@@ -18,26 +18,20 @@
 /* Base App Styling */
 body, .stApp {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif !important;
+    overflow-x: hidden !important;
 }
 
-/* HIDE Streamlit's default auto-generated multi-page sidebar links */
+/* Hide default Streamlit auto-generated page links */
 [data-testid="stSidebarNav"] {
     display: none !important;
 }
 
-/* Main Content Padding & Layout */
-.main .block-container {
-    padding-top: 2rem !important;
-    padding-bottom: 3.5rem !important;
-    padding-left: 2.5rem !important;
-    padding-right: 2.5rem !important;
-    max-width: 1440px !important;
-}
-
-/* Sidebar Customization & Prevent Horizontal Scrollbar */
+/* Compact, Well-Proportioned Sidebar (260px) */
 section[data-testid="stSidebar"] {
+    min-width: 250px !important;
+    max-width: 270px !important;
+    width: 260px !important;
     overflow-x: hidden !important;
-    border-right: 1px solid #E2E8F0;
 }
 
 section[data-testid="stSidebar"] > div {
@@ -45,36 +39,65 @@ section[data-testid="stSidebar"] > div {
 }
 
 section[data-testid="stSidebar"] .block-container {
-    padding-top: 1.5rem !important;
-    padding-left: 1.25rem !important;
-    padding-right: 1.25rem !important;
+    padding-top: 1.25rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
     overflow-x: hidden !important;
 }
 
-/* Modern Sidebar Navigation: Hide round radio dots and turn into sleek clickable pills */
+/* Streamlit Main Content Container */
+.main .block-container {
+    padding-top: 1.5rem !important;
+    padding-bottom: 3rem !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    max-width: 1400px !important;
+}
+
+/* Modern Linear-Style Navigation Items in Sidebar */
 section[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] > label > div:first-child {
     display: none !important;
 }
 
 section[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] > label {
-    border-radius: 9px !important;
-    padding: 10px 14px !important;
-    margin: 3px 0 !important;
+    border-radius: 6px !important;
+    padding: 7px 10px !important;
+    margin: 2px 0 !important;
     cursor: pointer !important;
     width: 100% !important;
-    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
     border: 1px solid transparent !important;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 section[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] > label:hover {
-    transform: translateX(3px) !important;
+    background-color: var(--nav-hover-bg, #F1F5F9) !important;
 }
 
-/* Animations */
+section[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] > label[data-checked="true"] {
+    background-color: var(--nav-active-bg, #EFF6FF) !important;
+    border: 1px solid var(--nav-active-border, #BFDBFE) !important;
+}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] > label[data-checked="true"] p {
+    color: var(--nav-active-text, #1D4ED8) !important;
+    font-weight: 700 !important;
+}
+
+/* ForeSight KPI Card Styling & Hover Micro-Interaction */
+.foresight-kpi-card {
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.foresight-kpi-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px -2px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Smooth Fade-in Animation */
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(8px);
     }
     to {
         opacity: 1;
@@ -82,79 +105,60 @@ section[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup
     }
 }
 
-/* ForeSight KPI Card with Hover Lift */
-.foresight-kpi-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
-}
-
-.foresight-kpi-card:hover {
-    transform: translateY(-3px) !important;
-    box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.12) !important;
-}
-
-/* Typography Hierarchy */
-h1 {
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 1.9rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.035em !important;
-    margin-bottom: 0.35rem !important;
-}
-
-h2 {
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 1.5rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.025em !important;
-    margin-top: 1rem !important;
-    margin-bottom: 0.6rem !important;
-}
-
-h3 {
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 1.15rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.015em !important;
-    margin-top: 1.2rem !important;
-    margin-bottom: 0.5rem !important;
-}
-
-p, span, label {
-    font-family: 'Inter', sans-serif !important;
-}
-
-/* Modern Form Controls */
+/* Form Controls & Inputs */
 div[data-baseweb="input"], div[data-baseweb="select"] > div {
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     font-family: 'Inter', sans-serif !important;
     font-size: 13px !important;
-    transition: all 0.15s ease !important;
+    transition: border-color 0.15s ease !important;
+}
+
+div[data-baseweb="input"]:focus-within, div[data-baseweb="select"] > div:focus-within {
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* Streamlit Segmented Control Customization */
+div[data-testid="stSegmentedControl"] > div {
+    border-radius: 6px !important;
+    padding: 2px !important;
 }
 
 /* Buttons */
 .stButton > button {
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     font-weight: 600 !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 13px !important;
-    padding: 0.45rem 1rem !important;
-    transition: all 0.18s ease !important;
+    font-size: 12.5px !important;
+    padding: 0.35rem 0.85rem !important;
+    transition: all 0.15s ease !important;
 }
 
 .stButton > button:hover {
     transform: translateY(-1px) !important;
 }
 
-/* Plotly Graph Card Styling */
+/* Plotly Chart Card Styling */
 .js-plotly-plot {
-    border-radius: 12px !important;
-    border: 1px solid #E2E8F0 !important;
-    box-shadow: 0 1px 3px rgba(15,23,42,0.05) !important;
-    animation: fadeInUp 0.4s ease-out !important;
+    border-radius: 10px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    animation: fadeInUp 0.3s ease-out !important;
 }
 
 /* Dataframe & Tables */
 div[data-testid="stDataFrame"] {
-    border-radius: 10px !important;
-    animation: fadeInUp 0.4s ease-out !important;
+    border-radius: 8px !important;
+    animation: fadeInUp 0.3s ease-out !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Filter Toolbar Card */
+.fs-filter-bar {
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeInUp 0.25s ease-out;
 }
