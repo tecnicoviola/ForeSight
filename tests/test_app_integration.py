@@ -60,3 +60,4 @@ def test_sales_forecasting_integration():
     assert "eval_results" in state
     comp = state["eval_results"]["comparison_table"]
     assert len(comp) == 3
+

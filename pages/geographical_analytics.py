@@ -3,10 +3,16 @@ Module 4: Geographical Analytics Page.
 Global market distribution, country rankings, international vs. domestic UK revenue shares, and choropleth mapping.
 """
 
+import sys
+from pathlib import Path
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 from src.data.loader import load_country_sales
 from src.analytics.country_analysis import compute_uk_vs_international, get_top_countries
@@ -17,13 +23,14 @@ from src.utils.helpers import (
     apply_theme_to_figure,
     render_kpi_card_html,
 )
-from src.utils.config import THEME, CURRENCY_SYMBOL
+from src.utils.config import THEME, CURRENCY_SYMBOL, APP_NAME
+from src.utils.layout import load_custom_css, render_sidebar_header, render_sidebar_provenance
 
 
 def render_geographical_analytics():
     st.markdown("## Geographical Analytics & Global Market Distribution")
     st.markdown(
-        "<p style='color:#64748B; font-size:14px; margin-top:-8px; margin-bottom:20px;'>"
+        "<p style='color:#64748B; font-size:14px; margin-top:-6px; margin-bottom:22px;'>"
         "Worldwide sales distribution and international penetration across 43 verified delivery destinations."
         "</p>",
         unsafe_allow_html=True,
@@ -50,7 +57,7 @@ def render_geographical_analytics():
             render_kpi_card_html(
                 "International Revenue",
                 format_currency(uk_vs_intl["intl_revenue"]),
-                f"{uk_vs_intl['intl_share_pct']}% generated export turnover",
+                f"{uk_vs_intl['intl_share_pct']}% export turnover",
                 badge="Exports",
                 badge_type="success",
             ),
@@ -130,7 +137,6 @@ def render_geographical_analytics():
 
     with c_right:
         st.markdown("### Country Revenue Contribution Share")
-        # Donut of top 5 countries + other
         top_slice = df_countries.head(5).copy()
         rem_rev = df_countries.iloc[5:]["Revenue"].sum()
         if rem_rev > 0:
@@ -179,3 +185,24 @@ def render_geographical_analytics():
         hide_index=True,
         use_container_width=True,
     )
+
+
+if __name__ == "__main__":
+    st.set_page_config(
+        page_title=f"Geographical Analytics — {APP_NAME}",
+        page_icon="🌍",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+    load_custom_css()
+    with st.sidebar:
+        render_sidebar_header()
+        st.markdown(
+            f"<div style='background:#EFF6FF; border:1px solid #DBEAFE; border-radius:8px; padding:8px 12px; margin-bottom:12px;'>"
+            f"<span style='font-size:13px; font-weight:700; color:{THEME['primary']};'>🌍 Geographical Analytics</span>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown("<hr style='border:0; border-top:1px solid #E2E8F0; margin:16px 0;'>", unsafe_allow_html=True)
+        render_sidebar_provenance()
+    render_geographical_analytics()

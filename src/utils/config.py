@@ -1,6 +1,6 @@
 """
-Application Configuration and Design Constants for SalesPulse.
-Inspired by Toolfolio.com: Modern, minimal, professional, data-focused, clean light aesthetic.
+Application Configuration and Design Constants for ForeSight.
+Design System: Modern, minimal, premium SaaS aesthetic (Plus Jakarta Sans / Inter typography, clean slate palette).
 """
 
 from pathlib import Path
@@ -21,12 +21,12 @@ PRODUCT_PARQUET = PROCESSED_DIR / "product_sales.parquet"
 COUNTRY_PARQUET = PROCESSED_DIR / "country_sales.parquet"
 SUMMARY_JSON = PROCESSED_DIR / "cleaning_summary.json"
 
-# UI / Design System Theme (Toolfolio Inspired)
+# UI / Design System Theme (ForeSight Modern SaaS Aesthetic)
 THEME = {
-    "primary": "#2563EB",         # Professional Royal Blue / Indigo
+    "primary": "#2563EB",         # Electric Royal Blue
     "primary_dark": "#1D4ED8",
     "primary_light": "#EFF6FF",
-    "accent": "#0D9488",          # Teal accent
+    "accent": "#0D9488",          # Modern Teal
     "accent_subtle": "#F0FDFA",
     "background": "#F8FAFC",      # Slate 50 ultra clean background
     "surface": "#FFFFFF",         # Pure white card surface
@@ -44,11 +44,12 @@ THEME = {
     ]
 }
 
-# Typography
-FONT_FAMILY = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+# Typography: Modern Google Font Pair (Plus Jakarta Sans + Inter)
+FONT_FAMILY = "'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
 
 # Currency and Locale
 CURRENCY_SYMBOL = "£"
+APP_NAME = "ForeSight"
+APP_TAGLINE = "Sales Trend Forecasting & Retail Analytics"
 DATASET_NAME = "UCI Online Retail II"
 DATASET_CITATION = "Chen, D. (2012). Online Retail II. UCI Machine Learning Repository."
-

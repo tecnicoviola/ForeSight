@@ -45,3 +45,4 @@ def compute_pareto_distribution(df_products: pd.DataFrame) -> Dict[str, Any]:
         "pct_of_catalog_for_80_pct": pct_for_80,
         "top_10_pct_revenue_share": top_10_pct_share,
     }
+

@@ -264,3 +264,4 @@ SalesPulse is fully compatible with free hosting on **Streamlit Community Cloud*
 - **Historical Period (2009–2011)**: The dataset reflects British e-commerce retail behavior from December 2009 to December 2011. Forecasts demonstrate statistical regression methodology and demand dynamics on genuine historical data rather than current macro retail conditions.
 - **UK Market Concentration**: The retailer was UK-based, meaning approximately 85% of transactions and revenue originate in the United Kingdom. International projections reflect secondary export demand.
 - **External Covariates**: The models rely on autoregressive temporal patterns and past demand. Exogenous factors such as macro inflation, ad spend, and exchange rate volatility are not recorded in the original transaction dataset.
+

@@ -35,3 +35,4 @@ def get_top_countries(df_countries: pd.DataFrame, top_n: int = 10, exclude_uk: b
     if exclude_uk:
         df = df[df["Country"] != "United Kingdom"]
     return df.nlargest(top_n, "Revenue").reset_index(drop=True)
+

@@ -136,3 +136,4 @@ def test_recursive_forecasting():
         assert (future_df["Predicted_Revenue"] >= 0).all()
         assert future_df["Week_Start"].is_monotonic_increasing
         assert future_df["Week_Start"].iloc[0] > weekly["Week_Start"].max()
+

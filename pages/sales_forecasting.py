@@ -8,10 +8,16 @@ Includes chronological holdout evaluation (MAE, RMSE, R2), model comparison benc
 and recursive future multi-step forecasting across 4, 8, or 12 week horizons.
 """
 
+import sys
+from pathlib import Path
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 from src.data.loader import load_weekly_sales
 from src.forecasting.feature_engineering import prepare_training_data
@@ -24,7 +30,8 @@ from src.utils.helpers import (
     apply_theme_to_figure,
     render_kpi_card_html,
 )
-from src.utils.config import THEME, CURRENCY_SYMBOL
+from src.utils.config import THEME, CURRENCY_SYMBOL, APP_NAME
+from src.utils.layout import load_custom_css, render_sidebar_header, render_sidebar_provenance
 
 
 @st.cache_data(show_spinner=False)
@@ -50,7 +57,7 @@ def get_trained_models_and_evaluation(holdout_weeks: int = 12):
 def render_sales_forecasting():
     st.markdown("## Sales Forecasting & Regression Model Comparison")
     st.markdown(
-        "<p style='color:#64748B; font-size:14px; margin-top:-8px; margin-bottom:20px;'>"
+        "<p style='color:#64748B; font-size:14px; margin-top:-6px; margin-bottom:22px;'>"
         "Supervised machine learning time-series regression models trained on historical weekly revenue to evaluate predictive accuracy and project future weekly demand."
         "</p>",
         unsafe_allow_html=True,
@@ -60,8 +67,8 @@ def render_sales_forecasting():
     with st.container():
         st.markdown(
             f"""
-            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:10px; padding:14px 18px; margin-bottom:18px;">
-                <span style="font-size:13px; font-weight:600; color:{THEME['text_primary']};">Forecasting Engine Parameters</span>
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:10px; padding:12px 16px; margin-bottom:14px;">
+                <span style="font-size:12px; font-weight:700; color:{THEME['text_primary']}; text-transform:uppercase; letter-spacing:0.04em;">Forecasting Engine Parameters</span>
             </div>
             """,
             unsafe_allow_html=True,
@@ -72,6 +79,7 @@ def render_sales_forecasting():
                 "Chronological Holdout Validation Period:",
                 [8, 12, 16],
                 index=1,
+                key="fc_holdout_weeks",
                 help="Number of most recent historical weeks reserved as strictly unseen test observations.",
             )
         with c_param2:
@@ -79,6 +87,7 @@ def render_sales_forecasting():
                 "Future Forecast Horizon:",
                 [4, 8, 12],
                 index=1,
+                key="fc_horizon_weeks",
                 help="Number of future weeks to forecast beyond the historical dataset timeline.",
             )
         with c_param3:
@@ -86,6 +95,7 @@ def render_sales_forecasting():
                 "Active Forecasting Model:",
                 ["Best Model (Auto-Selected)", "Linear Regression", "Polynomial Regression", "Random Forest"],
                 index=0,
+                key="fc_selected_model",
             )
 
     # Train and evaluate models
@@ -98,7 +108,6 @@ def render_sales_forecasting():
     best_model_name = eval_results["best_model_name"]
     holdout_preds = eval_results["predictions"]
     y_test = state["y_test"]
-    X_test = state["X_test"]
 
     active_model_name = best_model_name if selected_model_name.startswith("Best Model") else selected_model_name
     active_model = models[active_model_name]
@@ -134,7 +143,7 @@ def render_sales_forecasting():
             render_kpi_card_html(
                 "Mean Absolute Error",
                 format_currency(active_row["MAE (£)"]),
-                "Average absolute variance per week",
+                "Average absolute error per week",
                 badge="MAE",
                 badge_type="neutral",
             ),
@@ -179,7 +188,6 @@ def render_sales_forecasting():
     # Section 2: Actual vs Predicted on Holdout Period
     st.markdown("### Holdout Period Validation: Actual vs. Predicted Weekly Sales")
     
-    # Extract test week dates
     test_dates = clean_df.iloc[-holdout_weeks:]["Week_Start"].reset_index(drop=True)
     
     fig_holdout = go.Figure()
@@ -226,12 +234,10 @@ def render_sales_forecasting():
 
     future_df = forecast_future_weeks(active_model, weekly_df, horizon_weeks=horizon_weeks, model_name=active_model_name)
 
-    # Assemble Combined Historical + Forecast Timeline Chart
-    recent_history = weekly_df.tail(26).copy()  # Show last 26 weeks for context
+    recent_history = weekly_df.tail(26).copy()
 
     fig_future = go.Figure()
 
-    # Historical line
     fig_future.add_trace(
         go.Scatter(
             x=recent_history["Week_Start"],
@@ -244,7 +250,6 @@ def render_sales_forecasting():
         )
     )
 
-    # Connecting segment from last historical to first forecast point
     last_actual_point = pd.DataFrame([{
         "Week_Start": recent_history["Week_Start"].iloc[-1],
         "Predicted_Revenue": recent_history["Revenue"].iloc[-1],
@@ -263,7 +268,6 @@ def render_sales_forecasting():
         )
     )
 
-    # Vertical demarcation line between history and forecast
     last_hist_date = recent_history["Week_Start"].iloc[-1]
     fig_future.add_vline(
         x=last_hist_date.timestamp() * 1000,
@@ -305,20 +309,39 @@ def render_sales_forecasting():
         min_proj = future_df["Predicted_Revenue"].min()
         max_proj = future_df["Predicted_Revenue"].max()
 
+        card_summary_html = (
+            f'<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(15,23,42,0.05);">'
+            f'<div style="font-size:11px; font-weight:700; color:{THEME["text_secondary"]}; text-transform:uppercase; letter-spacing:0.05em;">TOTAL CUMULATIVE FORECAST</div>'
+            f'<div style="font-size:26px; font-weight:800; color:{THEME["primary"]}; margin:6px 0; letter-spacing:-0.03em;">{format_currency(total_projected)}</div>'
+            f'<div style="font-size:12px; color:{THEME["text_muted"]};">Expected revenue across next {horizon_weeks} weeks</div>'
+            f'<hr style="border:0; border-top:1px solid #E2E8F0; margin:14px 0;">'
+            f'<div style="font-size:13px; color:{THEME["text_secondary"]}; line-height:1.8;">'
+            f'<b>Weekly Average:</b> {format_currency(mean_projected)}<br>'
+            f'<b>Projected Minimum:</b> {format_currency(min_proj)}<br>'
+            f'<b>Projected Maximum:</b> {format_currency(max_proj)}<br>'
+            f'<b>Target Horizon:</b> {horizon_weeks} Weeks'
+            f'</div>'
+            f'</div>'
+        )
+        st.markdown(card_summary_html, unsafe_allow_html=True)
+
+
+if __name__ == "__main__":
+    st.set_page_config(
+        page_title=f"Sales Forecasting — {APP_NAME}",
+        page_icon="🔮",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+    load_custom_css()
+    with st.sidebar:
+        render_sidebar_header()
         st.markdown(
-            f"""
-            <div class="sp-card">
-                <div style="font-size:12px; font-weight:600; color:{THEME['text_secondary']};">TOTAL CUMULATIVE FORECAST</div>
-                <div style="font-size:24px; font-weight:700; color:{THEME['primary']}; margin: 6px 0;">{format_currency(total_projected)}</div>
-                <div style="font-size:12px; color:{THEME['text_muted']};">Expected revenue across next {horizon_weeks} weeks</div>
-                <hr style="border:0; border-top:1px solid #E2E8F0; margin:12px 0;">
-                <div style="font-size:13px; color:{THEME['text_secondary']}; line-height:1.8;">
-                    <b>Weekly Average:</b> {format_currency(mean_projected)}<br>
-                    <b>Projected Minimum:</b> {format_currency(min_proj)}<br>
-                    <b>Projected Maximum:</b> {format_currency(max_proj)}<br>
-                    <b>Target Horizon:</b> {horizon_weeks} Weeks
-                </div>
-            </div>
-            """,
+            f"<div style='background:#EFF6FF; border:1px solid #DBEAFE; border-radius:8px; padding:8px 12px; margin-bottom:12px;'>"
+            f"<span style='font-size:13px; font-weight:700; color:{THEME['primary']};'>🔮 Sales Forecasting</span>"
+            f"</div>",
             unsafe_allow_html=True,
         )
+        st.markdown("<hr style='border:0; border-top:1px solid #E2E8F0; margin:16px 0;'>", unsafe_allow_html=True)
+        render_sidebar_provenance()
+    render_sales_forecasting()

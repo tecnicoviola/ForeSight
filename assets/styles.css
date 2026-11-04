@@ -1,152 +1,175 @@
-/* Toolfolio-Inspired Minimal Professional Analytics Theme */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* ForeSight — Modern Minimal SaaS Analytics Theme */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-html, body, [class*="css"] {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #0F172A;
+/* Global Font and Base Settings */
+html, body, [class*="css"], .stApp {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    background-color: #F8FAFC !important;
+    color: #0F172A !important;
 }
 
-/* Main App Container */
-.stApp {
-    background-color: #F8FAFC;
+/* HIDE Streamlit's default auto-generated multi-page sidebar links */
+[data-testid="stSidebarNav"] {
+    display: none !important;
 }
 
-/* Remove Streamlit default top decoration */
+/* Top Streamlit Header */
 header[data-testid="stHeader"] {
-    background-color: rgba(248, 250, 252, 0.9);
-    border-bottom: 1px solid #E2E8F0;
-    backdrop-filter: blur(8px);
+    background-color: rgba(248, 250, 252, 0.85) !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+    backdrop-filter: blur(10px) !important;
 }
 
-/* Main Content Padding */
+/* Main Content Container */
 .main .block-container {
-    padding-top: 1.8rem;
-    padding-bottom: 3rem;
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
-    max-width: 1400px;
+    padding-top: 2rem !important;
+    padding-bottom: 3.5rem !important;
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+    max-width: 1440px !important;
 }
 
-/* Left Sidebar */
+/* Sidebar Customization */
 section[data-testid="stSidebar"] {
-    background-color: #FFFFFF;
-    border-right: 1px solid #E2E8F0;
+    background-color: #FFFFFF !important;
+    border-right: 1px solid #E2E8F0 !important;
 }
 
 section[data-testid="stSidebar"] .block-container {
-    padding-top: 1.5rem;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    padding-top: 1.5rem !important;
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
 }
 
-/* Modern Card Style */
-.sp-card {
-    background-color: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 1.25rem 1.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
-    margin-bottom: 1rem;
-    transition: box-shadow 0.15s ease-in-out;
+/* Sidebar Radio Buttons (Navigation) */
+section[data-testid="stSidebar"] div[data-testid="stRadio"] > div {
+    gap: 4px !important;
 }
 
-.sp-card:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
+    background: transparent !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    margin: 2px 0 !important;
+    transition: all 0.15s ease-in-out !important;
+    cursor: pointer !important;
 }
 
-/* Headers */
-h1 {
-    font-size: 1.75rem !important;
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
+    background-color: #F1F5F9 !important;
+}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label[data-checked="true"] {
+    background-color: #EFF6FF !important;
+    border: 1px solid #DBEAFE !important;
+}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label[data-checked="true"] p {
+    color: #2563EB !important;
     font-weight: 700 !important;
+}
+
+/* ForeSight KPI Card */
+.foresight-kpi-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.foresight-kpi-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+    border-color: #CBD5E1 !important;
+}
+
+/* Clean Typography */
+h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 1.85rem !important;
+    font-weight: 800 !important;
     color: #0F172A !important;
-    letter-spacing: -0.03em !important;
-    margin-bottom: 0.25rem !important;
+    letter-spacing: -0.035em !important;
+    margin-bottom: 0.35rem !important;
 }
 
 h2 {
-    font-size: 1.3rem !important;
-    font-weight: 600 !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 1.45rem !important;
+    font-weight: 700 !important;
     color: #0F172A !important;
-    letter-spacing: -0.02em !important;
-    margin-top: 1.25rem !important;
-    margin-bottom: 0.75rem !important;
+    letter-spacing: -0.025em !important;
+    margin-top: 1rem !important;
+    margin-bottom: 0.6rem !important;
 }
 
 h3 {
-    font-size: 1.05rem !important;
-    font-weight: 600 !important;
-    color: #334155 !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 1.12rem !important;
+    font-weight: 700 !important;
+    color: #1E293B !important;
+    letter-spacing: -0.015em !important;
+    margin-top: 1.2rem !important;
     margin-bottom: 0.5rem !important;
 }
 
 p, span, label {
+    font-family: 'Inter', sans-serif !important;
     color: #475569;
 }
 
-/* Metric styling */
-div[data-testid="stMetricValue"] {
-    font-size: 1.75rem !important;
-    font-weight: 700 !important;
-    color: #0F172A !important;
-    letter-spacing: -0.02em;
-}
-
-div[data-testid="stMetricLabel"] {
-    font-size: 0.8rem !important;
-    font-weight: 600 !important;
-    color: #64748B !important;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-/* Input elements */
-div[data-baseweb="select"] > div {
+/* Force Light Theme on Form Controls (Fix dark date picker inputs) */
+div[data-baseweb="input"], div[data-baseweb="select"] > div, div[data-baseweb="input"] input {
     background-color: #FFFFFF !important;
+    color: #0F172A !important;
     border-color: #CBD5E1 !important;
     border-radius: 8px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 13px !important;
 }
 
-/* Streamlit Tabs */
-button[data-baseweb="tab"] {
-    font-size: 0.9rem !important;
-    font-weight: 500 !important;
-    color: #64748B !important;
-    padding: 0.5rem 1rem !important;
+div[data-baseweb="input"]:focus-within, div[data-baseweb="select"] > div:focus-within {
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
 }
 
-button[data-baseweb="tab"][aria-selected="true"] {
-    color: #2563EB !important;
-    border-bottom-color: #2563EB !important;
+/* Buttons */
+button[kind="secondary"], .stButton > button {
+    background-color: #FFFFFF !important;
+    color: #1E293B !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 8px !important;
     font-weight: 600 !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 13px !important;
+    padding: 0.45rem 1rem !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+    transition: all 0.15s ease !important;
+}
+
+button[kind="secondary"]:hover, .stButton > button:hover {
+    background-color: #F8FAFC !important;
+    border-color: #94A3B8 !important;
+    color: #0F172A !important;
+}
+
+button[kind="primary"] {
+    background-color: #2563EB !important;
+    color: #FFFFFF !important;
+    border: 1px solid #1D4ED8 !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+
+/* Plotly Graph Containers */
+.js-plotly-plot {
+    border-radius: 12px !important;
+    border: 1px solid #E2E8F0 !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04) !important;
 }
 
 /* Dataframe & Tables */
 div[data-testid="stDataFrame"] {
-    border: 1px solid #E2E8F0;
-    border-radius: 10px;
-    background-color: #FFFFFF;
-}
-
-/* Badges and Tags */
-.sp-badge {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.sp-badge-primary {
-    background-color: #EFF6FF;
-    color: #2563EB;
-}
-
-.sp-badge-success {
-    background-color: #ECFDF5;
-    color: #059669;
-}
-
-.sp-badge-neutral {
-    background-color: #F1F5F9;
-    color: #475569;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04) !important;
 }

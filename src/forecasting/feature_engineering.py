@@ -59,3 +59,4 @@ def prepare_training_data(weekly_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Ser
     y = valid_df[TARGET_COLUMN]
     
     return X, y, valid_df
+

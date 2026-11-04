@@ -79,3 +79,4 @@ def compute_peak_and_trough_periods(
         "peaks": peaks,
         "troughs": troughs
     }
+

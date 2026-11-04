@@ -1,5 +1,5 @@
 """
-SalesPulse — Sales Trend Forecasting & Retail Analytics.
+ForeSight — Sales Trend Forecasting & Retail Analytics.
 Main Application Entry Point.
 """
 
@@ -12,7 +12,8 @@ BASE_DIR = Path(__file__).resolve().parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from src.utils.config import THEME, DATASET_NAME, DATASET_CITATION, ASSETS_DIR
+from src.utils.config import APP_NAME, APP_TAGLINE, THEME
+from src.utils.layout import load_custom_css, render_sidebar_header, render_sidebar_provenance
 from pages.sales_overview import render_sales_overview
 from pages.sales_analytics import render_sales_analytics
 from pages.product_analytics import render_product_analytics
@@ -20,18 +21,10 @@ from pages.geographical_analytics import render_geographical_analytics
 from pages.sales_forecasting import render_sales_forecasting
 
 
-def load_custom_css():
-    """Injects Toolfolio-inspired custom styling."""
-    css_file = ASSETS_DIR / "styles.css"
-    if css_file.exists():
-        with open(css_file, "r") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-
 def main():
     st.set_page_config(
-        page_title="SalesPulse — Retail Analytics & Forecasting",
-        page_icon="📈",
+        page_title=f"{APP_NAME} — {APP_TAGLINE}",
+        page_icon="✦",
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -40,24 +33,12 @@ def main():
 
     # Sidebar Header & Branding
     with st.sidebar:
+        render_sidebar_header()
+
         st.markdown(
-            f"""
-            <div style="padding-bottom:14px; margin-bottom:14px; border-bottom:1px solid #E2E8F0;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="background:{THEME['primary']}; color:white; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px;">
-                        ⚡
-                    </div>
-                    <div>
-                        <div style="font-size:18px; font-weight:700; color:{THEME['text_primary']}; letter-spacing:-0.03em;">SalesPulse</div>
-                        <div style="font-size:11px; color:{THEME['text_muted']}; font-weight:500;">Retail Analytics & Forecasting</div>
-                    </div>
-                </div>
-            </div>
-            """,
+            "<p style='font-size:11px; font-weight:700; text-transform:uppercase; color:#94A3B8; letter-spacing:0.06em; margin-bottom:8px;'>Navigation</p>",
             unsafe_allow_html=True,
         )
-
-        st.markdown("<p style='font-size:11px; font-weight:600; text-transform:uppercase; color:#94A3B8; letter-spacing:0.05em; margin-bottom:6px;'>Navigation</p>", unsafe_allow_html=True)
 
         pages = [
             "Sales Overview",
@@ -77,34 +58,17 @@ def main():
 
         # Page selector
         selected_page = st.radio(
-            "Go to",
+            "Select Module",
             pages,
             format_func=lambda p: f"{icons.get(p, '•')}  {p}",
             label_visibility="collapsed",
+            key="active_nav_module",
         )
 
-        st.markdown("<hr style='border:0; border-top:1px solid #E2E8F0; margin:20px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='border:0; border-top:1px solid #E2E8F0; margin:18px 0;'>", unsafe_allow_html=True)
+        render_sidebar_provenance()
 
-        # Dataset Provenance Card
-        st.markdown(
-            f"""
-            <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; padding:12px 14px;">
-                <div style="font-size:11px; font-weight:700; color:{THEME['text_secondary']}; text-transform:uppercase; letter-spacing:0.04em;">Verified Dataset</div>
-                <div style="font-size:13px; font-weight:600; color:{THEME['text_primary']}; margin-top:2px;">{DATASET_NAME}</div>
-                <div style="font-size:11px; color:{THEME['text_muted']}; margin-top:4px;">
-                    1,067,371 genuine transactions<br>
-                    Period: Dec 2009 – Dec 2011<br>
-                    License: CC BY 4.0
-                </div>
-            </div>
-            <div style="margin-top:16px; font-size:11px; color:#94A3B8; line-height:1.4;">
-                Academic Project built with Streamlit, Plotly, Scikit-learn & Pandas.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    # Route to selected page
+    # Route to selected module
     if selected_page == "Sales Overview":
         render_sales_overview()
     elif selected_page == "Sales Analytics":

@@ -83,3 +83,4 @@ def load_cleaned_transactions() -> pd.DataFrame:
     df = pd.read_parquet(CLEANED_PARQUET)
     df["InvoiceDate"] = pd.to_datetime(df["InvoiceDate"])
     return df
+

@@ -70,3 +70,4 @@ def train_models(
         fitted_models[name] = model
 
     return fitted_models
+

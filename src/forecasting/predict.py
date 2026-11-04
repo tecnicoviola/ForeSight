@@ -74,3 +74,4 @@ def forecast_future_weeks(
         })
 
     return pd.DataFrame(future_records)
+

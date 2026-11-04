@@ -73,3 +73,4 @@ def compare_models(
         "selection_criterion": f"Lowest {selection_metric.upper()} on chronological holdout test set",
         "predictions": predictions,
     }
+

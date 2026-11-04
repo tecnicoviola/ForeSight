@@ -4,11 +4,17 @@ Granular multi-frequency sales trend analysis across Daily, Weekly, and Monthly 
 Includes growth/decline rate tracking, peak/trough detection, and year-over-year performance benchmarking.
 """
 
+import sys
+from pathlib import Path
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 from src.data.loader import load_daily_sales, load_weekly_sales, load_monthly_sales
 from src.analytics.sales_metrics import (
@@ -22,13 +28,14 @@ from src.utils.helpers import (
     apply_theme_to_figure,
     render_kpi_card_html,
 )
-from src.utils.config import THEME, CURRENCY_SYMBOL
+from src.utils.config import THEME, CURRENCY_SYMBOL, APP_NAME
+from src.utils.layout import load_custom_css, render_sidebar_header, render_sidebar_provenance
 
 
 def render_sales_analytics():
     st.markdown("## Sales Analytics & Time-Series Dynamics")
     st.markdown(
-        "<p style='color:#64748B; font-size:14px; margin-top:-8px; margin-bottom:20px;'>"
+        "<p style='color:#64748B; font-size:14px; margin-top:-6px; margin-bottom:22px;'>"
         "Multi-frequency historical examination of retail velocity, seasonal surges, period-over-period growth rates, and operational extremes."
         "</p>",
         unsafe_allow_html=True,
@@ -43,6 +50,7 @@ def render_sales_analytics():
         "Select Time Granularity",
         ["Weekly Cadence (Primary Forecast Baseline)", "Daily Resolution", "Monthly Overview"],
         horizontal=True,
+        key="analytics_granularity",
     )
 
     if "Weekly" in tab_granularity:
@@ -92,7 +100,7 @@ def render_sales_analytics():
             render_kpi_card_html(
                 f"Mean {title_prefix} Revenue",
                 format_currency(avg_revenue),
-                f"Standard deviation: {format_currency(active_df['Revenue'].std())}",
+                f"Std Dev: {format_currency(active_df['Revenue'].std())}",
                 badge_type="neutral",
             ),
             unsafe_allow_html=True,
@@ -164,7 +172,6 @@ def render_sales_analytics():
     df_m["Month_Num"] = df_m["Month_Start"].dt.month
     df_m["Month_Name"] = df_m["Month_Start"].dt.strftime("%b")
 
-    # Pivot by month name and year
     pivot_yoy = df_m.pivot_table(index="Month_Num", columns="Year", values="Revenue", aggfunc="sum").fillna(0)
     month_labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     pivot_yoy.index = [month_labels[i - 1] for i in pivot_yoy.index]
@@ -207,3 +214,24 @@ def render_sales_analytics():
         t_table["Transactions"] = t_table["Transactions"].apply(lambda v: format_number(v))
         t_table["Quantity"] = t_table["Quantity"].apply(lambda v: format_number(v))
         st.dataframe(t_table, hide_index=True, use_container_width=True)
+
+
+if __name__ == "__main__":
+    st.set_page_config(
+        page_title=f"Sales Analytics — {APP_NAME}",
+        page_icon="📉",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+    load_custom_css()
+    with st.sidebar:
+        render_sidebar_header()
+        st.markdown(
+            f"<div style='background:#EFF6FF; border:1px solid #DBEAFE; border-radius:8px; padding:8px 12px; margin-bottom:12px;'>"
+            f"<span style='font-size:13px; font-weight:700; color:{THEME['primary']};'>📉 Sales Analytics</span>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown("<hr style='border:0; border-top:1px solid #E2E8F0; margin:16px 0;'>", unsafe_allow_html=True)
+        render_sidebar_provenance()
+    render_sales_analytics()
