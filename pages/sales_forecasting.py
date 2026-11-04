@@ -29,9 +29,10 @@ from src.utils.helpers import (
     format_number,
     apply_theme_to_figure,
     render_kpi_card_html,
+    get_current_theme,
 )
-from src.utils.config import THEME, CURRENCY_SYMBOL, APP_NAME
-from src.utils.layout import load_custom_css, render_sidebar_header, render_sidebar_provenance
+from src.utils.config import CURRENCY_SYMBOL, APP_NAME
+from src.utils.layout import load_custom_css, render_sidebar_header, render_sidebar_provenance, render_theme_toggle
 
 
 @st.cache_data(show_spinner=False)
@@ -55,9 +56,12 @@ def get_trained_models_and_evaluation(holdout_weeks: int = 12):
 
 
 def render_sales_forecasting():
+    theme = get_current_theme()
+    is_dark = theme["mode"] == "dark"
+
     st.markdown("## Sales Forecasting & Regression Model Comparison")
     st.markdown(
-        "<p style='color:#64748B; font-size:14px; margin-top:-6px; margin-bottom:22px;'>"
+        f"<p style='color:{theme['text_muted']}; font-size:14px; margin-top:-6px; margin-bottom:22px; font-weight:500;'>"
         "Supervised machine learning time-series regression models trained on historical weekly revenue to evaluate predictive accuracy and project future weekly demand."
         "</p>",
         unsafe_allow_html=True,
@@ -65,10 +69,12 @@ def render_sales_forecasting():
 
     # Forecasting Configuration Controls
     with st.container():
+        card_bg = theme["surface"]
+        card_border = theme["border"]
         st.markdown(
             f"""
-            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:10px; padding:12px 16px; margin-bottom:14px;">
-                <span style="font-size:12px; font-weight:700; color:{THEME['text_primary']}; text-transform:uppercase; letter-spacing:0.04em;">Forecasting Engine Parameters</span>
+            <div style="background:{card_bg}; border:1px solid {card_border}; border-radius:10px; padding:12px 18px; margin-bottom:14px;">
+                <span style="font-size:12px; font-weight:700; color:{theme['text_primary']}; text-transform:uppercase; letter-spacing:0.04em;">Forecasting Engine Parameters</span>
             </div>
             """,
             unsafe_allow_html=True,
@@ -124,6 +130,7 @@ def render_sales_forecasting():
                 "Auto-Selected Best" if selected_model_name.startswith("Best Model") else "User-Selected",
                 badge="Active",
                 badge_type="primary",
+                accent_bar="#2563EB",
             ),
             unsafe_allow_html=True,
         )
@@ -135,6 +142,7 @@ def render_sales_forecasting():
                 f"Evaluation on {holdout_weeks} holdout weeks",
                 badge="RMSE",
                 badge_type="neutral",
+                accent_bar="#F59E0B",
             ),
             unsafe_allow_html=True,
         )
@@ -146,29 +154,32 @@ def render_sales_forecasting():
                 "Average absolute error per week",
                 badge="MAE",
                 badge_type="neutral",
+                accent_bar="#8B5CF6",
             ),
             unsafe_allow_html=True,
         )
     with k4:
         r2_val = active_row["R²"]
         b_type = "success" if r2_val > 0.3 else ("warning" if r2_val > 0 else "danger")
+        accent_r2 = "#10B981" if r2_val > 0.3 else "#F59E0B"
         st.markdown(
             render_kpi_card_html(
-                "R² Coefficient of Determination",
+                "R² Coefficient",
                 f"{r2_val:.4f}",
                 "Variance explained by model",
                 badge="Holdout R²",
                 badge_type=b_type,
+                accent_bar=accent_r2,
             ),
             unsafe_allow_html=True,
         )
 
-    st.markdown("<hr style='border:0; border-top:1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+    st.markdown(f"<hr style='border:0; border-top:1px solid {theme['border']}; margin: 20px 0;'>", unsafe_allow_html=True)
 
     # Section 1: Model Comparison Benchmarking Table
     st.markdown("### Model Comparison & Holdout Validation Benchmark")
     st.markdown(
-        f"<p style='color:#64748B; font-size:13px; margin-top:-6px;'>"
+        f"<p style='color:{theme['text_muted']}; font-size:13px; margin-top:-6px;'>"
         f"Strict chronological evaluation across identical holdout period ({holdout_weeks} weeks). "
         f"<b>Best performing model: {best_model_name}</b> ({eval_results['selection_criterion']})."
         f"</p>",
@@ -191,19 +202,24 @@ def render_sales_forecasting():
     test_dates = clean_df.iloc[-holdout_weeks:]["Week_Start"].reset_index(drop=True)
     
     fig_holdout = go.Figure()
+    ground_truth_color = "#FFFFFF" if is_dark else "#0F172A"
     fig_holdout.add_trace(
         go.Scatter(
             x=test_dates,
             y=y_test.values,
             mode="lines+markers",
             name="Actual Weekly Revenue (Ground Truth)",
-            line=dict(color=THEME["text_primary"], width=2.5),
+            line=dict(color=ground_truth_color, width=2.5),
             marker=dict(size=7),
             hovertemplate="<b>Actual</b>: %{x|%d %b %Y}<br>Revenue: " + CURRENCY_SYMBOL + "%{y:,.2f}<extra></extra>",
         )
     )
 
-    colors = {"Linear Regression": "#0D9488", "Polynomial Regression": "#8B5CF6", "Random Forest": "#F59E0B"}
+    colors = {
+        "Linear Regression": "#14B8A6" if is_dark else "#0D9488",
+        "Polynomial Regression": "#A78BFA" if is_dark else "#8B5CF6",
+        "Random Forest": "#FBBF24" if is_dark else "#F59E0B",
+    }
     for m_name in models.keys():
         pred_vals = holdout_preds[m_name]
         is_active = m_name == active_model_name
@@ -225,7 +241,7 @@ def render_sales_forecasting():
     # Section 3: Future Recursive Sales Forecast
     st.markdown(f"### Future Weekly Sales Projection ({horizon_weeks} Weeks Ahead)")
     st.markdown(
-        f"<p style='color:#64748B; font-size:13px; margin-top:-6px;'>"
+        f"<p style='color:{theme['text_muted']}; font-size:13px; margin-top:-6px;'>"
         f"Generated using recursive autoregression via <b>{active_model_name}</b>. "
         f"Preceding predictions feed dynamically into subsequent weekly lag and rolling features."
         f"</p>",
@@ -244,7 +260,7 @@ def render_sales_forecasting():
             y=recent_history["Revenue"],
             mode="lines+markers",
             name="Historical Actual Revenue",
-            line=dict(color=THEME["primary"], width=2.5),
+            line=dict(color=theme["primary"], width=2.5),
             marker=dict(size=5),
             hovertemplate="<b>Actual</b>: %{x|%d %b %Y}<br>Revenue: " + CURRENCY_SYMBOL + "%{y:,.2f}<extra></extra>",
         )
@@ -273,10 +289,10 @@ def render_sales_forecasting():
         x=last_hist_date.timestamp() * 1000,
         line_width=1.5,
         line_dash="dot",
-        line_color="#94A3B8",
+        line_color="#94A3B8" if not is_dark else "#4B5563",
         annotation_text="Forecast Horizon Start",
         annotation_position="top left",
-        annotation_font=dict(size=11, color="#64748B"),
+        annotation_font=dict(size=11, color=theme["text_muted"]),
     )
 
     apply_theme_to_figure(fig_future, height=400)
@@ -310,12 +326,12 @@ def render_sales_forecasting():
         max_proj = future_df["Predicted_Revenue"].max()
 
         card_summary_html = (
-            f'<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(15,23,42,0.05);">'
-            f'<div style="font-size:11px; font-weight:700; color:{THEME["text_secondary"]}; text-transform:uppercase; letter-spacing:0.05em;">TOTAL CUMULATIVE FORECAST</div>'
-            f'<div style="font-size:26px; font-weight:800; color:{THEME["primary"]}; margin:6px 0; letter-spacing:-0.03em;">{format_currency(total_projected)}</div>'
-            f'<div style="font-size:12px; color:{THEME["text_muted"]};">Expected revenue across next {horizon_weeks} weeks</div>'
-            f'<hr style="border:0; border-top:1px solid #E2E8F0; margin:14px 0;">'
-            f'<div style="font-size:13px; color:{THEME["text_secondary"]}; line-height:1.8;">'
+            f'<div style="background:{theme["surface"]}; border:1px solid {theme["border"]}; border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.08);">'
+            f'<div style="font-size:11px; font-weight:700; color:{theme["text_secondary"]}; text-transform:uppercase; letter-spacing:0.05em;">TOTAL CUMULATIVE FORECAST</div>'
+            f'<div style="font-size:26px; font-weight:800; color:{theme["primary"]}; margin:6px 0; letter-spacing:-0.03em;">{format_currency(total_projected)}</div>'
+            f'<div style="font-size:12px; color:{theme["text_muted"]};">Expected revenue across next {horizon_weeks} weeks</div>'
+            f'<hr style="border:0; border-top:1px solid {theme["border"]}; margin:14px 0;">'
+            f'<div style="font-size:13px; color:{theme["text_secondary"]}; line-height:1.8;">'
             f'<b>Weekly Average:</b> {format_currency(mean_projected)}<br>'
             f'<b>Projected Minimum:</b> {format_currency(min_proj)}<br>'
             f'<b>Projected Maximum:</b> {format_currency(max_proj)}<br>'
@@ -327,6 +343,8 @@ def render_sales_forecasting():
 
 
 if __name__ == "__main__":
+    if "theme_mode" not in st.session_state:
+        st.session_state["theme_mode"] = "Light"
     st.set_page_config(
         page_title=f"Sales Forecasting — {APP_NAME}",
         page_icon="🔮",
@@ -336,12 +354,7 @@ if __name__ == "__main__":
     load_custom_css()
     with st.sidebar:
         render_sidebar_header()
-        st.markdown(
-            f"<div style='background:#EFF6FF; border:1px solid #DBEAFE; border-radius:8px; padding:8px 12px; margin-bottom:12px;'>"
-            f"<span style='font-size:13px; font-weight:700; color:{THEME['primary']};'>🔮 Sales Forecasting</span>"
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-        st.markdown("<hr style='border:0; border-top:1px solid #E2E8F0; margin:16px 0;'>", unsafe_allow_html=True)
+        render_theme_toggle()
+        st.markdown("<hr style='border:0; border-top:1px solid rgba(226, 232, 240, 0.4); margin:14px 0;'>", unsafe_allow_html=True)
         render_sidebar_provenance()
     render_sales_forecasting()

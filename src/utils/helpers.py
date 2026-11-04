@@ -1,11 +1,18 @@
 """
 Formatting, UI card, and Plotly styling helpers for ForeSight.
+Dynamically respects Light / Dark mode settings with animations and high-contrast typography.
 """
 
 from typing import Dict, Any, Optional
-import textwrap
+import streamlit as st
 import plotly.graph_objects as go
-from src.utils.config import THEME, CURRENCY_SYMBOL, FONT_FAMILY
+from src.utils.config import THEME_LIGHT, THEME_DARK, CURRENCY_SYMBOL, FONT_FAMILY
+
+
+def get_current_theme() -> Dict[str, Any]:
+    """Returns the active theme palette based on session state."""
+    mode = st.session_state.get("theme_mode", "Light")
+    return THEME_DARK if mode == "Dark" else THEME_LIGHT
 
 
 def format_currency(val: float, precision: int = 2, compact: bool = False) -> str:
@@ -50,17 +57,20 @@ def format_percentage(val: float, include_sign: bool = False) -> str:
 
 
 def apply_theme_to_figure(fig: go.Figure, title: Optional[str] = None, height: int = 380) -> go.Figure:
-    """Applies modern minimal SaaS styling to a Plotly figure."""
+    """Applies dynamic Light or Dark mode styling to a Plotly figure."""
+    theme = get_current_theme()
+    is_dark = theme["mode"] == "dark"
+
     fig.update_layout(
         title=dict(
             text=f"<b>{title}</b>" if title else "",
-            font=dict(family=FONT_FAMILY, size=15, color=THEME["text_primary"]),
+            font=dict(family=FONT_FAMILY, size=15, color=theme["text_primary"]),
             x=0.01,
             y=0.96,
         ) if title else None,
-        font=dict(family=FONT_FAMILY, color=THEME["text_secondary"], size=12),
-        paper_bgcolor=THEME["surface"],
-        plot_bgcolor=THEME["surface"],
+        font=dict(family=FONT_FAMILY, color=theme["text_secondary"], size=12),
+        paper_bgcolor=theme["surface"],
+        plot_bgcolor=theme["surface"],
         height=height,
         margin=dict(l=45, r=30, t=45 if title else 25, b=40),
         legend=dict(
@@ -69,24 +79,24 @@ def apply_theme_to_figure(fig: go.Figure, title: Optional[str] = None, height: i
             y=1.02,
             xanchor="right",
             x=1,
-            font=dict(family=FONT_FAMILY, size=11, color=THEME["text_secondary"]),
+            font=dict(family=FONT_FAMILY, size=11, color=theme["text_secondary"]),
         ),
         xaxis=dict(
             showgrid=True,
-            gridcolor=THEME["border_subtle"],
-            linecolor=THEME["border"],
+            gridcolor=theme["border_subtle"],
+            linecolor=theme["border"],
             zeroline=False,
-            tickfont=dict(family=FONT_FAMILY, size=11, color=THEME["text_muted"]),
+            tickfont=dict(family=FONT_FAMILY, size=11, color=theme["text_muted"]),
         ),
         yaxis=dict(
             showgrid=True,
-            gridcolor=THEME["border_subtle"],
-            linecolor=THEME["border"],
+            gridcolor=theme["border_subtle"],
+            linecolor=theme["border"],
             zeroline=False,
-            tickfont=dict(family=FONT_FAMILY, size=11, color=THEME["text_muted"]),
+            tickfont=dict(family=FONT_FAMILY, size=11, color=theme["text_muted"]),
         ),
         hoverlabel=dict(
-            bgcolor=THEME["text_primary"],
+            bgcolor="#0F172A" if not is_dark else "#1F2937",
             font_size=12,
             font_family=FONT_FAMILY,
             font_color="#FFFFFF"
@@ -100,39 +110,57 @@ def render_kpi_card_html(
     value: str,
     subtitle: Optional[str] = None,
     badge: Optional[str] = None,
-    badge_type: str = "neutral"
+    badge_type: str = "neutral",
+    accent_bar: str = "#2563EB"
 ) -> str:
     """
-    Renders a modern, minimal, 100% unindented HTML KPI card.
-    Guaranteed zero markdown code block leaks.
+    Renders a modern, animated, unindented HTML KPI card.
+    Prevents text-wrapping on large numbers and adapts to Light/Dark modes.
     """
-    badge_colors = {
+    theme = get_current_theme()
+    is_dark = theme["mode"] == "dark"
+
+    badge_colors_light = {
         "success": ("#ECFDF5", "#059669"),
         "danger": ("#FEF2F2", "#DC2626"),
         "warning": ("#FFFBEB", "#D97706"),
         "primary": ("#EFF6FF", "#2563EB"),
-        "neutral": ("#F1F5F9", "#475569"),
+        "neutral": ("#F1F5F9", "#334155"),
     }
-    bg, fg = badge_colors.get(badge_type, badge_colors["neutral"])
+    badge_colors_dark = {
+        "success": ("#064E3B", "#34D399"),
+        "danger": ("#7F1D1D", "#F87171"),
+        "warning": ("#78350F", "#FBBF24"),
+        "primary": ("#1E3A8A", "#60A5FA"),
+        "neutral": ("#1F2937", "#CBD5E1"),
+    }
+
+    badge_palette = badge_colors_dark if is_dark else badge_colors_light
+    bg, fg = badge_palette.get(badge_type, badge_palette["neutral"])
     
     badge_span = (
-        f'<span style="background:{bg}; color:{fg}; padding:3px 9px; border-radius:9999px; font-size:11px; font-weight:600; letter-spacing:0.02em;">{badge}</span>'
+        f'<span style="background:{bg}; color:{fg}; padding:3px 8px; border-radius:9999px; font-size:11px; font-weight:700; letter-spacing:0.02em;">{badge}</span>'
         if badge else ""
     )
     
     subtitle_div = (
-        f'<div style="font-size:12px; color:{THEME["text_muted"]}; margin-top:6px; font-weight:400;">{subtitle}</div>'
+        f'<div style="font-size:12px; color:{theme["text_muted"]}; margin-top:6px; font-weight:500;">{subtitle}</div>'
         if subtitle else ""
     )
 
-    # Return pure unindented single-line or dedented HTML block
+    card_bg = theme["surface"]
+    card_border = theme["border"]
+    text_primary = theme["text_primary"]
+    text_secondary = theme["text_secondary"]
+    shadow = "0 4px 6px -1px rgba(0, 0, 0, 0.3)" if is_dark else "0 1px 3px rgba(15,23,42,0.06)"
+
     raw_html = (
-        f'<div class="foresight-kpi-card" style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(15,23,42,0.05); margin-bottom:14px; min-height:115px; display:flex; flex-direction:column; justify-content:space-between;">'
+        f'<div class="foresight-kpi-card" style="background:{card_bg}; border:1px solid {card_border}; border-top:3px solid {accent_bar}; border-radius:12px; padding:18px 20px; box-shadow:{shadow}; margin-bottom:14px; min-height:118px; display:flex; flex-direction:column; justify-content:space-between; animation:fadeInUp 0.35s ease-out;">'
         f'<div style="display:flex; justify-content:space-between; align-items:center;">'
-        f'<span style="font-size:11px; font-weight:700; color:{THEME["text_secondary"]}; text-transform:uppercase; letter-spacing:0.06em;">{title}</span>'
+        f'<span style="font-size:11px; font-weight:700; color:{text_secondary}; text-transform:uppercase; letter-spacing:0.06em;">{title}</span>'
         f'{badge_span}'
         f'</div>'
-        f'<div style="font-size:26px; font-weight:800; color:{THEME["text_primary"]}; margin-top:8px; letter-spacing:-0.03em; font-family:\'Plus Jakarta Sans\', sans-serif;">'
+        f'<div style="font-size:clamp(20px, 1.8vw, 26px); font-weight:800; color:{text_primary}; margin-top:8px; letter-spacing:-0.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:\'Plus Jakarta Sans\', sans-serif;">'
         f'{value}'
         f'</div>'
         f'{subtitle_div}'

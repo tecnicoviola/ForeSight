@@ -1,11 +1,23 @@
-/* ForeSight — Modern Minimal SaaS Analytics Theme */
+/* ForeSight — High-Contrast Modern SaaS Theme with Micro-Animations */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-/* Global Font and Base Settings */
-html, body, [class*="css"], .stApp {
-    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-    background-color: #F8FAFC !important;
-    color: #0F172A !important;
+/* Preserve Streamlit Material Icons font (Fixes 'keyboard_double' text bug) */
+[data-testid="stIconMaterial"], .material-symbols-rounded, [class*="material-symbols"] {
+    font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    line-height: 1 !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+    direction: ltr !important;
+}
+
+/* Base App Styling */
+body, .stApp {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif !important;
 }
 
 /* HIDE Streamlit's default auto-generated multi-page sidebar links */
@@ -13,14 +25,7 @@ html, body, [class*="css"], .stApp {
     display: none !important;
 }
 
-/* Top Streamlit Header */
-header[data-testid="stHeader"] {
-    background-color: rgba(248, 250, 252, 0.85) !important;
-    border-bottom: 1px solid #E2E8F0 !important;
-    backdrop-filter: blur(10px) !important;
-}
-
-/* Main Content Container */
+/* Main Content Padding & Layout */
 .main .block-container {
     padding-top: 2rem !important;
     padding-bottom: 3.5rem !important;
@@ -29,72 +34,77 @@ header[data-testid="stHeader"] {
     max-width: 1440px !important;
 }
 
-/* Sidebar Customization */
+/* Sidebar Customization & Prevent Horizontal Scrollbar */
 section[data-testid="stSidebar"] {
-    background-color: #FFFFFF !important;
-    border-right: 1px solid #E2E8F0 !important;
+    overflow-x: hidden !important;
+    border-right: 1px solid #E2E8F0;
+}
+
+section[data-testid="stSidebar"] > div {
+    overflow-x: hidden !important;
 }
 
 section[data-testid="stSidebar"] .block-container {
     padding-top: 1.5rem !important;
     padding-left: 1.25rem !important;
     padding-right: 1.25rem !important;
+    overflow-x: hidden !important;
 }
 
-/* Sidebar Radio Buttons (Navigation) */
-section[data-testid="stSidebar"] div[data-testid="stRadio"] > div {
-    gap: 4px !important;
+/* Modern Sidebar Navigation: Hide round radio dots and turn into sleek clickable pills */
+section[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] > label > div:first-child {
+    display: none !important;
 }
 
-section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
-    background: transparent !important;
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-    margin: 2px 0 !important;
-    transition: all 0.15s ease-in-out !important;
+section[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] > label {
+    border-radius: 9px !important;
+    padding: 10px 14px !important;
+    margin: 3px 0 !important;
     cursor: pointer !important;
+    width: 100% !important;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid transparent !important;
 }
 
-section[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
-    background-color: #F1F5F9 !important;
+section[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] > label:hover {
+    transform: translateX(3px) !important;
 }
 
-section[data-testid="stSidebar"] div[data-testid="stRadio"] label[data-checked="true"] {
-    background-color: #EFF6FF !important;
-    border: 1px solid #DBEAFE !important;
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-section[data-testid="stSidebar"] div[data-testid="stRadio"] label[data-checked="true"] p {
-    color: #2563EB !important;
-    font-weight: 700 !important;
-}
-
-/* ForeSight KPI Card */
+/* ForeSight KPI Card with Hover Lift */
 .foresight-kpi-card {
-    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
 }
 
 .foresight-kpi-card:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
-    border-color: #CBD5E1 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.12) !important;
 }
 
-/* Clean Typography */
+/* Typography Hierarchy */
 h1 {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 1.85rem !important;
+    font-size: 1.9rem !important;
     font-weight: 800 !important;
-    color: #0F172A !important;
     letter-spacing: -0.035em !important;
     margin-bottom: 0.35rem !important;
 }
 
 h2 {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 1.45rem !important;
+    font-size: 1.5rem !important;
     font-weight: 700 !important;
-    color: #0F172A !important;
     letter-spacing: -0.025em !important;
     margin-top: 1rem !important;
     margin-bottom: 0.6rem !important;
@@ -102,9 +112,8 @@ h2 {
 
 h3 {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 1.12rem !important;
+    font-size: 1.15rem !important;
     font-weight: 700 !important;
-    color: #1E293B !important;
     letter-spacing: -0.015em !important;
     margin-top: 1.2rem !important;
     margin-bottom: 0.5rem !important;
@@ -112,64 +121,40 @@ h3 {
 
 p, span, label {
     font-family: 'Inter', sans-serif !important;
-    color: #475569;
 }
 
-/* Force Light Theme on Form Controls (Fix dark date picker inputs) */
-div[data-baseweb="input"], div[data-baseweb="select"] > div, div[data-baseweb="input"] input {
-    background-color: #FFFFFF !important;
-    color: #0F172A !important;
-    border-color: #CBD5E1 !important;
+/* Modern Form Controls */
+div[data-baseweb="input"], div[data-baseweb="select"] > div {
     border-radius: 8px !important;
     font-family: 'Inter', sans-serif !important;
     font-size: 13px !important;
-}
-
-div[data-baseweb="input"]:focus-within, div[data-baseweb="select"] > div:focus-within {
-    border-color: #2563EB !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+    transition: all 0.15s ease !important;
 }
 
 /* Buttons */
-button[kind="secondary"], .stButton > button {
-    background-color: #FFFFFF !important;
-    color: #1E293B !important;
-    border: 1px solid #CBD5E1 !important;
+.stButton > button {
     border-radius: 8px !important;
     font-weight: 600 !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
     font-size: 13px !important;
     padding: 0.45rem 1rem !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
-    transition: all 0.15s ease !important;
+    transition: all 0.18s ease !important;
 }
 
-button[kind="secondary"]:hover, .stButton > button:hover {
-    background-color: #F8FAFC !important;
-    border-color: #94A3B8 !important;
-    color: #0F172A !important;
+.stButton > button:hover {
+    transform: translateY(-1px) !important;
 }
 
-button[kind="primary"] {
-    background-color: #2563EB !important;
-    color: #FFFFFF !important;
-    border: 1px solid #1D4ED8 !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-}
-
-/* Plotly Graph Containers */
+/* Plotly Graph Card Styling */
 .js-plotly-plot {
     border-radius: 12px !important;
     border: 1px solid #E2E8F0 !important;
-    background: #FFFFFF !important;
-    box-shadow: 0 1px 3px rgba(15,23,42,0.04) !important;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.05) !important;
+    animation: fadeInUp 0.4s ease-out !important;
 }
 
 /* Dataframe & Tables */
 div[data-testid="stDataFrame"] {
-    border: 1px solid #E2E8F0 !important;
     border-radius: 10px !important;
-    background-color: #FFFFFF !important;
-    box-shadow: 0 1px 3px rgba(15,23,42,0.04) !important;
+    animation: fadeInUp 0.4s ease-out !important;
 }
